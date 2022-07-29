@@ -16,7 +16,7 @@ c++ -O3 -Wall -shared -std=c++11 -fPIC $(python3 -m pybind11 --includes) simple.
 
 * Python side:
 
-```python3
+```python
 import example
 example.add(4,1230)
 ```
@@ -60,7 +60,7 @@ which makes them accessible from python: `example.the_answer` and `example.what`
 
 * Python side:
 
-```python3
+```python
 import pet
 p = pet.Pet("Rex")
 p.getName()
@@ -174,4 +174,38 @@ We can make arguments reject implicit conversions either declared using `py::imp
 ```cpp
 m.def("floats_only", [](double f) { return 0.5 * f;}, py::arg("f").noconvert()); // thus it accepts only data of type float
 m.def("floats_preferred", [](double f) {return 0.5 * f;}, py::arg("f"));
+```
+
+## None arguments
+
+Python would allow passing `None` to some functions, and in C++ side it would be `nullptr` for that argument.
+
+We can explicitly enable or disable this behaviour (default is to not allow) using the `.none())` method of the `py::arg` object:
+
+```cpp
+py::class_<Dog>(m, "Dog").def(py::init<>());
+py::class_<Cat>(m, "Cat").def(py::init<>());
+m.def("bark", [](Dog *dog) -> std::string {
+    if (dog) return "woof!"; // called with a Dog instance
+    else return "(no dog)"; // called with None, dog == nullptr
+}, py::arg("dog").none(true));
+
+m.def("meow", [](Cat *cat) -> std::string {
+    // can't be called with None argument
+    return "meow";
+}, py::arg("cat").none(false));
+
+```
+
+On Python side, when we call those methods:
+
+```python
+>>> from animals import Dog, Cat, bark, meow
+>>> bark(Dog())
+'woof!'
+>>> meow(Cat())
+'meow'
+>>> bark(None) # accepts None as defined
+'(no dog)'
+>>> meow(None) # exception will occur
 ```
