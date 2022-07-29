@@ -1,6 +1,8 @@
 # Pybind11-Bootcamp
 
-I'm using this repo to document my study and experiments with Pybind11
+I'm using this repo to document my study and experiments with Pybind11.
+
+Most of material here is taken from Pybind11 documentation <https://pybind11.readthedocs.io/>
 
 ## Notes
 
