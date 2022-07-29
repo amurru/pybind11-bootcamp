@@ -150,3 +150,28 @@ void print_dict(const py::dict& dict) {
 // it can be exported
 m.def("print_dict", &print_dict);
 ```
+
+## Accepting *args and **kwargs
+
+We can create functions that accept arbitrary numbers of arguments and keyword arguments the same way as in Python using pybind11:
+
+```cpp
+void generic(py::args args, const py::kwargs& kwargs) {
+    // do something with args ...
+    if (kwargs)
+    {
+        // do something with kwargs ...
+    }
+}
+// binding
+m.def("generic", &generic);
+```
+
+## Non-converting arguments
+
+We can make arguments reject implicit conversions either declared using `py::implicitly_convertible<A,B>()` or by convience (i.e. providing int to float):
+
+```cpp
+m.def("floats_only", [](double f) { return 0.5 * f;}, py::arg("f").noconvert()); // thus it accepts only data of type float
+m.def("floats_preferred", [](double f) {return 0.5 * f;}, py::arg("f"));
+```
